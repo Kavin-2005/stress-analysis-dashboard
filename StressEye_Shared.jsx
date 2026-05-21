@@ -69,10 +69,17 @@ export default function StressEyeApp(){
   const [activity,setActivity]=useState([]);
   const [chat,setChat]=useState([]);
   const [toast,setToast]=useState(null);
-  const [userName,setUserName]=useState(()=>localStorage.getItem('streye:username')||'');
+  const [userName,setUserName]=useState('');
   const [nameInput,setNameInput]=useState('');
   const [pollTs,setPollTs]=useState(0);
   const pollerRef=useRef(null);
+
+  // ── LOAD USERNAME FROM STORAGE ON MOUNT ──
+  useEffect(()=>{
+    window.storage.get('streye:username')
+      .then(r=>{ if(r&&r.value) setUserName(r.value); })
+      .catch(()=>{});
+  },[]);
 
   // ── SHOW TOAST ──
   const showToast=(msg,type='ok')=>{setToast({msg,type,id:Date.now()});};
@@ -81,7 +88,7 @@ export default function StressEyeApp(){
   const saveUserName=()=>{
     if(!nameInput.trim())return;
     const n=nameInput.trim();
-    localStorage.setItem('streye:username',n);
+    window.storage.set('streye:username',n).catch(()=>{});
     setUserName(n);
     showToast(`Welcome, ${n}!`,'ok');
   };
